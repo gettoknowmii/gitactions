@@ -76,7 +76,7 @@ jobs:
 
   deploy:
     needs: build
-    uses: ./.github/workflows/test2.yml
+    uses: .../../.github/workflows/test2.yml
     with:
       artifact-name: build-dist 
       secrets:
