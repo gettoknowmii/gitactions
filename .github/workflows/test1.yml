@@ -34,9 +34,12 @@ jobs:
       - name: Print out the dbuser and dbname
         run: echo "${{ env.dbname }} ${{ env.dbuser }}"
       - name: Gibberish
-        run: echo "proceeding .." 
+        env:
+          results: succeeded
+        run: echo "proceeding .. and $results" 
 
   test:
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - name: Get code
@@ -52,8 +55,8 @@ jobs:
         with:
           name: test-report
           path: /tmp/test
-      - name: Print out the dbuser and dbname
-        run: echo "${{ env.dbname }} ${{ env.dbuser }}"
+      - name: Print var-output 
+        run: echo $result 
 
   build:
     needs: test
@@ -75,7 +78,7 @@ jobs:
           path: /tmp/build
 
   report:
-    needs: [lint]
+    needs: [build]
     if: failure()
     runs-on: ubuntu-latest
     steps:
