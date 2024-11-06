@@ -14,19 +14,28 @@ on:
     paths-ignore:
       - '/nonexistent/*'
 
+env:
+  dbuser: herman
+  dbname: testdb
+
 jobs:
   lint:
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
-        working-directory: ./tmp
+    env:
+      dbuser: herman
+      dbname: testdb
 
     steps:
       - name: Get code
         uses: actions/checkout@v3
+      - name: Print out the dbuser and dbname
+        run: echo "${{ env.dbname }} ${{ env.dbuser }}"
       - name: Gibberish
         run: echo "proceeding .." 
+
   test:
     runs-on: ubuntu-latest
     steps:
@@ -43,6 +52,9 @@ jobs:
         with:
           name: test-report
           path: /tmp/test
+      - name: Print out the dbuser and dbname
+        run: echo "${{ env.dbname }} ${{ env.dbuser }}"
+
   build:
     needs: test
     runs-on: ubuntu-latest
@@ -50,6 +62,7 @@ jobs:
       - name: Get code
         uses: actions/checkout@v3
       - name: Build website
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         id: build-website
         run: |
           mkdir /tmp/build
@@ -63,17 +76,18 @@ jobs:
 
   deploy:
     needs: build
+    uses: ./.github/workflows/test2.yml
+    with:
+      artifact-name: build-dist 
+      secrets:
+        some-secret: ${{ secrets.mydbpassword }}
+
+  print-deploy-result:
+    needs: deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Get build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: build-dist
-      - name: Output contents
-        run: ls
-      - name: Deploy
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: echo "Deploying Website..."
+      - name: Print deploy output
+        run: echo "${{ needs.deploy.outputs.result }}"
 
   report:
     needs: [lint, deploy]
