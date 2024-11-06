@@ -36,8 +36,8 @@ jobs:
         continue-on-error: true
         id: run-tests
         run: |
-        mkdir /tmp/test
-        echo "Test completed successfully" >> /tmp/test/file1 
+          mkdir /tmp/test
+          echo "Test completed successfully" >> /tmp/test/file1 
       - name: Upload test report
         uses: actions/upload-artifact@v3
         with:
@@ -52,8 +52,8 @@ jobs:
       - name: Build website
         id: build-website
         run: |
-        mkdir /tmp/build
-        echo "building website in progress" >> /tmp/build/file1
+          mkdir /tmp/build
+          echo "building website in progress" >> /tmp/build/file1
 
       - name: Upload build report
         uses: actions/upload-artifact@v3
