@@ -74,23 +74,8 @@ jobs:
           name: build-dist
           path: /tmp/build
 
-  deploy:
-    needs: build
-    uses: .../../.github/workflows/test2.yml
-    with:
-      artifact-name: build-dist 
-      secrets:
-        some-secret: ${{ secrets.mydbpassword }}
-
-  print-deploy-result:
-    needs: deploy
-    runs-on: ubuntu-latest
-    steps:
-      - name: Print deploy output
-        run: echo "${{ needs.deploy.outputs.result }}"
-
   report:
-    needs: [lint, deploy]
+    needs: [lint]
     if: failure()
     runs-on: ubuntu-latest
     steps:
